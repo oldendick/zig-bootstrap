@@ -11,7 +11,7 @@ const fs = std.fs;
 const InstallDirectoryOptions = std.build.InstallDirectoryOptions;
 const assert = std.debug.assert;
 
-const zig_version = std.builtin.Version{ .major = 0, .minor = 7, .patch = 0 };
+const zig_version = std.builtin.Version{ .major = 0, .minor = 7, .patch = 1 };
 
 pub fn build(b: *Builder) !void {
     b.setPreferredReleaseMode(.ReleaseFast);
@@ -168,6 +168,9 @@ pub fn build(b: *Builder) !void {
             } else if (exe.target.isFreeBSD()) {
                 try addCxxKnownPath(b, cfg, exe, "libc++.a", null, need_cpp_includes);
                 exe.linkSystemLibrary("pthread");
+            } else if (exe.target.getOsTag() == .openbsd) {
+                try addCxxKnownPath(b, cfg, exe, "libc++.a", null, need_cpp_includes);
+                try addCxxKnownPath(b, cfg, exe, "libc++abi.a", null, need_cpp_includes);
             } else if (exe.target.isDarwin()) {
                 if (addCxxKnownPath(b, cfg, exe, "libgcc_eh.a", "", need_cpp_includes)) {
                     // Compiler is GCC.
